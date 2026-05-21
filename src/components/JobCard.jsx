@@ -43,7 +43,7 @@ export default function JobCard({ job, onEdit, onDelete, index }) {
         }
         .job-card:hover {
           border-color: var(--border-2);
-          box-shadow: -2px -3px 43px 7px rgba(15, 255, 255,0.66);
+          box-shadow: var(--shadow);
           transform: translateY(-2px);
         }
         .card-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
