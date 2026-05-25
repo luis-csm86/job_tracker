@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { Plus, Briefcase, RefreshCw, Search, ChevronDown } from 'lucide-react'
+import { Plus, Briefcase, RefreshCw, Search, Eye, EyeOff } from 'lucide-react'
 import { supabase } from './lib/supabase'
 import JobCard from './components/JobCard'
 import JobForm from './components/JobForm'
@@ -17,6 +17,7 @@ export default function App() {
   const [search, setSearch] = useState('')
   const [filterStatus, setFilterStatus] = useState('All')
   const [sortBy, setSortBy] = useState('date_desc')
+  const [hiddenStatuses, setHiddenStatuses] = useState(new Set ())
 
   const fetchJobs = useCallback(async () => {
     setLoading(true)
@@ -79,7 +80,8 @@ export default function App() {
         j.company_name?.toLowerCase().includes(q) ||
         j.location?.toLowerCase().includes(q)
       const matchStatus = filterStatus === 'All' || j.status === filterStatus
-      return matchSearch && matchStatus
+      const notHidden = !hiddenStatuses.has(j.status)
+      return matchSearch && matchStatus && notHidden
     })
     .sort((a, b) => {
       if (sortBy === 'date_desc') return new Date(b.created_at) - new Date(a.created_at)
@@ -88,6 +90,19 @@ export default function App() {
       if (sortBy === 'company')   return (a.company_name || '').localeCompare(b.company_name || '')
       return 0
     })
+
+  const toggleHidden = (status, e) => {
+    e.stopPropagation()
+    setHiddenStatuses(prev => {
+      const next = new Set(prev)
+      if (next.has(status)) next.delete(status)
+      else {
+        next.add(status)
+        if (filterStatus === status) setFilterStatus('All')
+        }
+      return next
+    })
+  }
 
   // Stats
   const stats = STATUS_ORDER.map(s => ({
@@ -148,6 +163,41 @@ export default function App() {
           background: var(--surface-2);
         }
         .stat-chip.active { border-color: var(--accent); color: var(--text); }
+        .stat-chip.hidden-chip {
+          opacity: 0.38;
+          border-style: dashed;
+        }
+        .stat-chip.hidden-chip:hover { opacity: 0.65; }
+        .eye-toggle {
+          display: flex; align-items: center;
+          margin-left: 4px;
+          padding: 2px;
+          border-radius: 4px;
+          color: var(--text-3);
+          opacity: 0;
+          transition: opacity 0.15s, color 0.15s;
+          background: none; border: none; cursor: pointer;
+        }
+        .stat-chip:hover .eye-toggle { opacity: 1; }
+        .eye-toggle:hover { color: var(--text); }
+        .hidden-banner {
+          display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+          padding: 8px 14px; border-radius: 8px;
+          border: 1px dashed var(--border-2);
+          background: var(--surface);
+          font-family: 'IBM Plex Mono', monospace;
+          font-size: 11px; color: var(--text-3);
+          margin-bottom: 16px;
+        }
+        .hidden-tag {
+          display: inline-flex; align-items: center; gap: 6px;
+          padding: 2px 8px; border-radius: 4px;
+          background: var(--surface-2);
+          border: 1px solid var(--border-2);
+          color: var(--text-2);
+          cursor: pointer; transition: all 0.15s;
+        }
+        .hidden-tag:hover { border-color: var(--accent); color: var(--accent); }
         .stat-count {
           font-weight: 600; font-size: 14px; color: var(--text);
         }
@@ -253,7 +303,7 @@ export default function App() {
         .refresh-btn:hover { border-color: var(--border-2); color: var(--text); }
         .spinning { animation: spin 0.8s linear infinite; }
       `}</style>
-
+ 
       {/* Header */}
       <header className="header">
         <div className="header-inner">
@@ -266,7 +316,7 @@ export default function App() {
           <span className="header-count">{jobs.length} applications</span>
         </div>
       </header>
-
+ 
       <main className="main">
         {/* Status filter chips */}
         <div className="stats-row">
@@ -277,25 +327,63 @@ export default function App() {
             <span className="stat-count">{jobs.length}</span>
             All
           </button>
-          {stats.map(s => (
-            <button
-              key={s.label}
-              className={`stat-chip ${filterStatus === s.label ? 'active' : ''}`}
-              onClick={() => setFilterStatus(s.label)}
-              style={filterStatus === s.label ? { borderColor: s.color, color: s.color } : {}}
-            >
-              <span
-                className="stat-count"
-                style={{ color: filterStatus === s.label ? s.color : undefined }}
+          {stats.map(s => {
+            const isHidden = hiddenStatuses.has(s.label)
+            const isActive = filterStatus === s.label
+            return (
+              <button
+                key={s.label}
+                className={`stat-chip ${isActive ? 'active' : ''} ${isHidden ? 'hidden-chip' : ''}`}
+                onClick={() => !isHidden && setFilterStatus(isActive ? 'All' : s.label)}
+                style={isActive && !isHidden ? { borderColor: s.color, color: s.color } : {}}
+                title={isHidden ? `${s.label} is hidden — click eye to show` : s.label}
               >
-                {s.count}
-              </span>
-              <span style={{ color: s.color, fontSize: '8px' }}>●</span>
-              {STATUS_CONFIG[s.label]?.label || s.label}
-            </button>
-          ))}
+                <span
+                  className="stat-count"
+                  style={{ color: isActive && !isHidden ? s.color : undefined }}
+                >
+                  {s.count}
+                </span>
+                <span style={{ color: s.color, fontSize: '8px' }}>●</span>
+                {STATUS_CONFIG[s.label]?.label || s.label}
+                <button
+                  className="eye-toggle"
+                  onClick={(e) => toggleHidden(s.label, e)}
+                  title={isHidden ? `Show ${s.label}` : `Hide ${s.label}`}
+                >
+                  {isHidden ? <Eye size={11} /> : <EyeOff size={11} />}
+                </button>
+              </button>
+            )
+          })}
         </div>
-
+ 
+        {/* Hidden statuses banner */}
+        {hiddenStatuses.size > 0 && (
+          <div className="hidden-banner">
+            <EyeOff size={12} />
+            <span>Hidden:</span>
+            {[...hiddenStatuses].map(s => (
+              <span
+                key={s}
+                className="hidden-tag"
+                onClick={() => setHiddenStatuses(prev => { const n = new Set(prev); n.delete(s); return n })}
+                title={`Click to show ${s}`}
+              >
+                <span style={{ width: 6, height: 6, borderRadius: '50%', background: STATUS_CONFIG[s]?.color, display: 'inline-block', flexShrink: 0 }} />
+                {STATUS_CONFIG[s]?.label || s}
+                <Eye size={10} />
+              </span>
+            ))}
+            <button
+              style={{ marginLeft: 'auto', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-3)', fontFamily: 'IBM Plex Mono, monospace', fontSize: 11 }}
+              onClick={() => setHiddenStatuses(new Set())}
+            >
+              Show all
+            </button>
+          </div>
+        )}
+ 
         {/* Controls */}
         <div className="controls">
           <div className="search-wrap">
@@ -318,7 +406,7 @@ export default function App() {
             Refresh
           </button>
         </div>
-
+ 
         {/* Error */}
         {error && (
           <div className="error-banner">
@@ -326,7 +414,7 @@ export default function App() {
             <button className="refresh-btn" onClick={fetchJobs}>Retry</button>
           </div>
         )}
-
+ 
         {/* Grid */}
         {loading ? (
           <div className="loading-grid">
@@ -360,12 +448,12 @@ export default function App() {
           </div>
         )}
       </main>
-
+ 
       {/* FAB */}
       <button className="fab" onClick={handleAdd} title="Add application">
         <Plus size={24} strokeWidth={2.5} />
       </button>
-
+ 
       {/* Form panel */}
       <JobForm
         open={formOpen}
