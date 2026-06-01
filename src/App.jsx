@@ -1,12 +1,12 @@
 import { useState, useEffect, useCallback } from 'react'
-import { Plus, Briefcase, RefreshCw, Search, Eye, EyeOff } from 'lucide-react'
+import { Plus, Briefcase, RefreshCw, Search, Eye, EyeOff, Sun, Moon } from 'lucide-react'
 import { supabase } from './lib/supabase'
 import JobCard from './components/JobCard'
 import JobForm from './components/JobForm'
 import { STATUS_CONFIG } from './components/StatusBadge'
 import './index.css'
 
-const STATUS_ORDER = ['Applied', 'Contacted', 'Waiting 2nd interview', 'No Reply', 'Discarded']
+const STATUS_ORDER = ['Applied', 'Contacted', 'Waiting 2nd interview', 'No Reply', 'Discarded', 'On Hold']
 
 export default function App() {
   const [jobs, setJobs] = useState([])
@@ -18,6 +18,16 @@ export default function App() {
   const [filterStatus, setFilterStatus] = useState('All')
   const [sortBy, setSortBy] = useState('date_desc')
   const [hiddenStatuses, setHiddenStatuses] = useState(new Set ())
+  const [theme, setTheme] = useState(() => {
+    const saved = localStorage.getItem('theme')
+     if (saved) return saved
+     return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark'
+})
+
+  useEffect(() => {
+    document.documentElement.classList.toggle('light', theme === 'light')
+    localStorage.setItem('theme', theme)
+  }, [theme])
 
   const fetchJobs = useCallback(async () => {
     setLoading(true)
@@ -117,10 +127,14 @@ export default function App() {
         .app { min-height: 100vh; }
         .header {
           position: sticky; top: 0; z-index: 50;
-          background: rgba(12,12,14,0.85);
+          background: rgba(10,10,39,0.85);
           backdrop-filter: blur(12px);
           border-bottom: 1px solid var(--border);
           padding: 0 24px;
+        }
+        .light .header {
+          background: #0066cc;
+          border-bottom: 1px solid #0055aa;
         }
         .header-inner {
           max-width: 1280px; margin: 0 auto;
@@ -140,8 +154,8 @@ export default function App() {
         }
         .header-count {
           font-family: 'IBM Plex Mono', monospace;
-          font-size: 11px; color: var(--text-3);
-          padding: 3px 8px; border: 1px solid var(--border);
+          font-size: 11px; color: var(--text);
+          padding: 3px 8px; border: 1px solid var(--accent-2);
           border-radius: 4px;
         }
         .main { max-width: 1280px; margin: 0 auto; padding: 32px 24px 80px; }
@@ -314,6 +328,13 @@ export default function App() {
             Job Tracker
           </div>
           <span className="header-count">{jobs.length} applications</span>
+          <button
+            onClick={() => setTheme(t => t === 'dark' ? 'light' : 'dark')}
+            className="refresh-btn"
+            title="Toggle theme"
+            >
+              {theme === 'dark' ? <Sun size={14} /> : <Moon size={14} />}
+            </button>
         </div>
       </header>
  
@@ -344,7 +365,7 @@ export default function App() {
                 >
                   {s.count}
                 </span>
-                <span style={{ color: s.color, fontSize: '8px' }}>●</span>
+                <span style={{ width: 10, height: 10, borderRadius: '50%', background: s.color, display: 'inline-block', flexShrink: 0 }} />
                 {STATUS_CONFIG[s.label]?.label || s.label}
                 <button
                   className="eye-toggle"

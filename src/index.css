@@ -10,14 +10,8 @@
   --text-2: #C3C3D1;
   --text-3: #9E9EB3;
   --accent: #a9eeff;
+  --accent-2: #00BFFF;
   --accent-dim: rgba(171, 255, 252, 0.12);
-
-  /* Status palette */
-  --s-discarded: #ef4444;
-  --s-noreply: #f97316;
-  --s-applied: #3b82f6;
-  --s-contacted: #a855f7;
-  --s-waiting: #22c55e;
   
   --radius: 10px;
   --radius-lg: 16px;
@@ -63,4 +57,18 @@ body {
 }
 @keyframes spin {
   to { transform: rotate(360deg); }
+}
+
+:root.light {
+  --bg: #f0f2fa;
+  --surface: #ffffff;
+  --surface-2: #e8eaf4;
+  --border: #d0d4e8;
+  --border-2: #b0b8d8;
+  --text: #0a0a27;
+  --text-2: #2e2e4d;
+  --text-3: #5a5a7a;
+  --accent: #0066cc;
+  --accent-2: #00BFFF; 
+  --accent-dim: rgba(0, 102, 204, 0.12);
 }
