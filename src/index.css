@@ -12,17 +12,6 @@
   --accent: #a9eeff;
   --accent-2: #00BFFF;
   --accent-dim: rgba(171, 255, 252, 0.12);
-<<<<<<< HEAD
-=======
-
-  /* Status palette */
-  --s-discarded: #ef4444;
-  --s-noreply: #f97316;
-  --s-applied: #3b82f6;
-  --s-contacted: #a855f7;
-  --s-waiting: #22c55e;
-  --s-onhold: #e6da33;
->>>>>>> 092eb8ab2664d36be8df0056888410459f628896
   
   --radius: 10px;
   --radius-lg: 16px;
@@ -69,7 +58,6 @@ body {
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
-<<<<<<< HEAD
 
 :root.light {
   --bg: #f0f2fa;
@@ -84,5 +72,3 @@ body {
   --accent-2: #00BFFF; 
   --accent-dim: rgba(0, 102, 204, 0.12);
 }
-=======
->>>>>>> 092eb8ab2664d36be8df0056888410459f628896
