@@ -3,7 +3,7 @@ const STATUS_CONFIG = {
   'No Reply':               { color: '#f97316', lightColor: '#d35400', bg: 'rgba(249,115,22,0.12)',  label: 'No Reply' },
   'Applied':                { color: '#3b82f6', lightColor: '#1a5fb4', bg: 'rgba(59,130,246,0.12)', label: 'Applied' },
   'Contacted':              { color: '#a855f7', lightColor: '#7b2fa8', bg: 'rgba(168,85,247,0.12)', label: 'Contacted' },
-  'Waiting 2nd interview':  { color: '#22c55e', lightColor: '#1a7a3c', bg: 'rgba(34,197,94,0.12)',  label: '2nd Interview' },
+  'Waiting interview':  { color: '#22c55e', lightColor: '#1a7a3c', bg: 'rgba(34,197,94,0.12)',  label: 'Waiting Interview' },
   'On Hold':                { color: '#e6da33', lightColor: '#C21E56', bg: 'rgba(230,218,51,0.12)', label: 'On Hold' },
 }
 

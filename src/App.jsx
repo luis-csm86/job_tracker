@@ -6,7 +6,7 @@ import JobForm from './components/JobForm'
 import { STATUS_CONFIG } from './components/StatusBadge'
 import './index.css'
 
-const STATUS_ORDER = ['Applied', 'Contacted', 'Waiting 2nd interview', 'No Reply', 'Discarded', 'On Hold']
+const STATUS_ORDER = ['Applied', 'Contacted', 'Waiting interview', 'No Reply', 'Discarded', 'On Hold']
 
 export default function App() {
   const [jobs, setJobs] = useState([])
