@@ -232,6 +232,7 @@ export default function JobForm({ open, onClose, onSave, initial }) {
                 <option value="">Select source…</option>
                 <option value="LinkedIn">🔷 LinkedIn</option>
                 <option value="Infojobs">🟠 Infojobs</option>
+                <option value="Indeed">🟩 Indeed</option>
               </select>
             </div>
             <div className="field">
