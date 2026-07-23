@@ -4,6 +4,7 @@ import StatusBadge from './StatusBadge'
 const SOURCE_ICONS = {
   LinkedIn:  '🔷',
   Infojobs:  '🟠',
+  Indeed: '🟩',
 }
 
 function formatDate(dateStr) {
